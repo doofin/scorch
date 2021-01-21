@@ -1,11 +1,18 @@
 "What I cannot create, I do not understand." - Richard Feynman.
 
+
+Scorch is a project that I wrote with the prime purpose of teaching myself the architecture of deep learning frameworks. I took PyTorch as a source of inspiration, because it has a nice imperative programming interface. Scorch is written in Scala, and is not as performant as the big players. In order to achieve that, I would have had to rely on existing C++ implementations of the algorithms, which would have resulted in missing the educational purpose. That said, it does contain most well known building blocks of neural networks, and since it's written for the JVM, it can leverage the features of this ecosystem. As an example of the latter, see my project [Akkordeon: Training neural networks with Akka.](https://github.com/botkop/akkordeon)
+
+
 Scorch
 ======
+
+[![Join the chat at https://gitter.im/botkop/scorch](https://badges.gitter.im/botkop/scorch.svg)](https://gitter.im/botkop/scorch?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Scorch is a deep learning framework in Scala inspired by PyTorch.
 
 It has [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) built in 
-and follows an [imperative coding style](https://mxnet.incubator.apache.org/architecture/program_model.html#symbolic-vs-imperative-programs).
+and follows an [imperative coding style](https://mxnet.apache.org/api/architecture/program_model).
 
 Scorch uses [numsca](https://github.com/botkop/numsca) for creation and processing of Tensors.
 
