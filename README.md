@@ -19,7 +19,7 @@ Scorch uses [numsca](https://github.com/botkop/numsca) for creation and processi
 Here's an example of a convolutional neural net, with relu and pooling followed by 2 affine layers:
 
 ```scala
-package scorch.sandbox
+package scorch.experimental
 
 import botkop.{numsca => ns}
 import scorch._

@@ -2,7 +2,8 @@ package scorch
 
 object Main {
   def main(args: Array[String]): Unit = {
-    scorTest.lrTest
+//    scorTest.lrTest
+    examples.charRnnHelpers.startTrain
   }
 
 }

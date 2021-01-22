@@ -1,24 +1,24 @@
 package scorch.nn
 
-import botkop.{numsca => ns}
-import com.typesafe.scalalogging.LazyLogging
-import scorch.autograd.Variable
-
 import scala.collection.parallel.mutable.ParArray
+import com.typesafe.scalalogging.LazyLogging
+
+import scorch.autograd.Variable
+import botkop.{numsca => ns}
+import ns._
+
+import ParallelModule._
 
 case class ParallelModule(module: Module, parallelism: Int) extends Module {
 
-  import ParallelModule._
   override def forward(x: Variable): Variable =
     ParallelizeFunction(x, module, parallelism).forward()
 }
 
 object ParallelModule {
-
   case class ParallelizeFunction(x: Variable, module: Module, parallelism: Int)
       extends scorch.autograd.Function
       with LazyLogging {
-    import ns._
 
     val batchSize: Int = x.shape.head
     val chunkSize: Int = Math.max(batchSize / parallelism, 1)

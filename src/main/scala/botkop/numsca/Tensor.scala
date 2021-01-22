@@ -141,8 +141,10 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
           case None =>
             NDArrayIndex.interval(handleNegIndex(nr.from, i), shape(i))
           case Some(n) =>
-            NDArrayIndex.interval(handleNegIndex(nr.from, i),
-                                  handleNegIndex(n, i))
+            NDArrayIndex.interval(
+              handleNegIndex(nr.from, i),
+              handleNegIndex(n, i)
+            )
         }
     }
     new Tensor(array.get(indexes: _*))
@@ -154,7 +156,8 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   }
 
   private def selectIndexes(
-      selection: Seq[Tensor]): (Array[Array[Int]], Option[Array[Int]]) = {
+      selection: Seq[Tensor]
+  ): (Array[Array[Int]], Option[Array[Int]]) = {
     if (selection.length == 1) {
       if (selection.head.isBoolean) {
         (indexByBooleanTensor(selection.head), None)
@@ -169,15 +172,19 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   }
 
   private def multiIndex(selection: Seq[Tensor]): Array[Array[Int]] = {
-    require(selection.forall(s => s.shape.head == 1),
-            s"shapes must be [1, n] (was: ${selection.map(_.shape.toList)}")
+    require(
+      selection.forall(s => s.shape.head == 1),
+      s"shapes must be [1, n] (was: ${selection.map(_.shape.toList)}"
+    )
 
     // broadcast selection to same shape
     val ts: Seq[INDArray] = Ops.tbc(selection: _*)
 
     val rank = ts.head.shape()(1)
-    require(ts.forall(s => s.shape()(1) == rank),
-            s"shapes must be of rank $rank (was ${ts.map(_.shape().toList)}")
+    require(
+      ts.forall(s => s.shape()(1) == rank),
+      s"shapes must be of rank $rank (was ${ts.map(_.shape().toList)}"
+    )
 
     (0 until rank).map { r =>
       ts.map(s => s.getInt(0, r)).toArray
@@ -230,9 +237,11 @@ object Tensor {
 
 }
 
-case class TensorSelection(t: Tensor,
-                           indexes: Array[Array[Int]],
-                           shape: Option[Array[Int]]) {
+case class TensorSelection(
+    t: Tensor,
+    indexes: Array[Array[Int]],
+    shape: Option[Array[Int]]
+) {
 
   def asTensor: Tensor = {
     val newData = indexes.map(ix => t.array.getDouble(ix: _*))

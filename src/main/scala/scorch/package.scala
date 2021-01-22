@@ -4,6 +4,7 @@ import scorch.nn.Dropout
 import Function._
 
 package object scorch {
+  lazy val getHomeDir: String = System.getProperty("user.home")
   implicit class AutoGradDoubleOps(d: Double) {
     def +(v: Variable): Variable = v + d
     def -(v: Variable): Variable = -v + d

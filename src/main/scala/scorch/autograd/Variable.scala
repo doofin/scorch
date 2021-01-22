@@ -1,12 +1,12 @@
 package scorch.autograd
 
+import scala.language.implicitConversions
+
 import botkop.numsca.Tensor
 import botkop.{numsca => ns}
 import com.typesafe.scalalogging.LazyLogging
 import scorch.nn.Module
 import scorch.nn.cnn.MaxPool2d
-
-import scala.language.implicitConversions
 
 import Function._
 
@@ -15,16 +15,15 @@ object Variable {
   def apply(d: Double, name: Option[String]): Variable =
     Variable(Tensor(d), name = name)
 
-  // import scorch.nn.Infer.Id
-  // implicit def moduleApply[T <: Module[Id]](m: T): (Variable) => Variable =
   implicit def moduleApply[T <: Module](m: T): (Variable) => Variable =
     m.forward
 }
 
-case class Variable(data: Tensor,
-                    gradFn: Option[Function] = None,
-                    name: Option[String] = None)
-    extends LazyLogging {
+case class Variable(
+    data: Tensor,
+    gradFn: Option[Function] = None,
+    name: Option[String] = None
+) extends LazyLogging {
 
   override def toString: String =
     if (name.isDefined) s"name: ${name.get}, data: $data" else s"data: $data"

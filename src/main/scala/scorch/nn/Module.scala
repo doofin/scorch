@@ -5,17 +5,6 @@ import scorch.autograd.Variable
 
 import scala.language.{higherKinds, implicitConversions}
 
-/*
-sealed trait Infer[F[_]]
-trait LowPriority {
-  implicit def inferDefault[F[_]]: Infer[F] = new Infer[F] {}
-}
-object Infer extends LowPriority {
-  type Id[A] = A
-  implicit def inferId: Infer[Id] = new Infer[Id] {}
-}
- */
-
 abstract class BaseModule(localParameters: Seq[Variable] = Nil) {
 
   // by default, obtain submodules through introspection
@@ -64,12 +53,15 @@ abstract class Module(localParameters: Seq[Variable] = Nil)
     with LazyLogging {
   def forward(x: Variable): Variable
   def apply(x: Variable): Variable = forward(x)
-  def par(parallelism: Int = Runtime.getRuntime.availableProcessors / 2): ParallelModule = {
+  def par(
+      parallelism: Int = Runtime.getRuntime.availableProcessors / 2
+  ): ParallelModule = {
     logger.info(s"parallelizing factor = $parallelism")
     ParallelModule(this, parallelism)
   }
 }
 
+/**for rnn */
 abstract class SeqModule(localParameters: Seq[Variable] = Nil)
     extends BaseModule(localParameters) {
   def forward(xs: Seq[Variable]): Seq[Variable]
@@ -81,5 +73,16 @@ abstract class Module[F[_]: Infer](localParameters: Seq[Variable] = Nil)
     extends BaseModule(localParameters) {
   def forward(x: F[Variable]): F[Variable]
   def apply(x: F[Variable]): F[Variable] = forward(x)
+}
+ */
+
+/*
+sealed trait Infer[F[_]]
+trait LowPriority {
+  implicit def inferDefault[F[_]]: Infer[F] = new Infer[F] {}
+}
+object Infer extends LowPriority {
+  type Id[A] = A
+  implicit def inferId: Infer[Id] = new Infer[Id] {}
 }
  */

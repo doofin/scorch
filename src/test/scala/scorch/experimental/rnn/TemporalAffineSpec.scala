@@ -1,4 +1,4 @@
-package scorch.sandbox.rnn
+package scorch.experimental.rnn
 
 import botkop.{numsca => ns}
 import org.nd4j.linalg.api.buffer.DataBuffer
@@ -7,7 +7,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import scorch.TestUtil._
 import scorch.autograd._
 import scorch.nn.Module
-import scorch.sandbox.rnn
+import scorch.experimental.rnn
 
 class TemporalAffineSpec extends FlatSpec with Matchers {
 
