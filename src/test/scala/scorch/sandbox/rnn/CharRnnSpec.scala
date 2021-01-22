@@ -11,6 +11,7 @@ import scorch.autograd._
 import scorch.nn._
 import scorch._
 import scorch.optim.{Optimizer, SGD}
+import Function._
 
 import scala.io.Source
 import scala.language.postfixOps
@@ -115,6 +116,7 @@ class CharRnnSpec extends FlatSpec with Matchers {
       }
 
       val loss = SoftmaxLoss(output, Variable(categoryTensor)).forward()
+      println(loss.data)
       loss.backward()
 
       optimizer.step()

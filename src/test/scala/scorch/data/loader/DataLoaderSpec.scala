@@ -27,9 +27,11 @@ class DataLoaderSpec extends FlatSpec with Matchers {
     val take = 10
 
     val loader =
-      new Cifar10DataLoader(miniBatchSize = miniBatchSize,
-                            mode = "train",
-                            take = Some(take * miniBatchSize)).toSeq
+      new Cifar10DataLoader(
+        miniBatchSize = miniBatchSize,
+        mode = "train",
+        take = Some(take * miniBatchSize)
+      ).toSeq
 
     assert(loader.size == take)
 
@@ -54,12 +56,14 @@ class DataLoaderSpec extends FlatSpec with Matchers {
     val numClasses = 10
 
     case class Net() extends Module {
-      val conv = Conv2d(numChannels = 3,
-                        numFilters = 4,
-                        filterSize = 5,
-                        weightScale = 1e-3,
-                        stride = 1,
-                        pad = 1)
+      val conv = Conv2d(
+        numChannels = 3,
+        numFilters = 4,
+        filterSize = 5,
+        weightScale = 1e-3,
+        stride = 1,
+        pad = 1
+      )
       val pool = MaxPool2d(poolSize = 2, stride = 2)
       val numFlatFeatures: Int =
         pool.outputShape(conv.outputShape(inputShape)).tail.product
@@ -73,9 +77,11 @@ class DataLoaderSpec extends FlatSpec with Matchers {
     val net = Net().par(parallelism)
 
     val optimizer = Adam(net.parameters, lr = 0.01)
-    val loader = new Cifar10DataLoader(miniBatchSize = batchSize,
-                                       mode = "train",
-                                       take = Some(numBatches * batchSize))
+    val loader = new Cifar10DataLoader(
+      miniBatchSize = batchSize,
+      mode = "train",
+      take = Some(numBatches * batchSize)
+    )
 
     val seq = loader.toSeq
 
@@ -90,7 +96,8 @@ class DataLoaderSpec extends FlatSpec with Matchers {
             val guessed = ns.argmax(yHat.data, axis = 1)
             val accuracy = ns.sum(y.data == guessed) / batchSize
             println(
-              s"$epoch:$i: loss: ${loss.data.squeeze()} accuracy: $accuracy")
+              s"$epoch:$i: loss: ${loss.data.squeeze()} accuracy: $accuracy"
+            )
 
             loss.backward()
             optimizer.step()

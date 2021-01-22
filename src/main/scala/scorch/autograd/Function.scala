@@ -9,7 +9,6 @@ import ns._
 import scala.language.postfixOps
 
 /** autodiff via reverse rule of Differentiation*/
-
 trait Function extends LazyLogging {
   def forward(): Variable
   def backward(gradOutput: Variable): Unit
@@ -307,8 +306,7 @@ object Function {
     }
   }
 
-  //============================================
-  // Loss functions
+  /**Loss functions*/
   case class SoftmaxLoss(actual: Variable, target: Variable) extends Function {
     val x: Tensor = actual.data
     val y: Tensor = target.data.T
