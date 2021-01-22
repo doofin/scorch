@@ -8,6 +8,8 @@ import ns._
 
 import scala.language.postfixOps
 
+/** autodiff via reverse rule of Differentiation*/
+
 trait Function extends LazyLogging {
   def forward(): Variable
   def backward(gradOutput: Variable): Unit
@@ -62,6 +64,7 @@ object Function {
     }
   }
 
+  /** multiple*/
   case class Mul(v1: Variable, v2: Variable) extends Function {
     override def forward(): Variable = Variable(v1.data * v2.data, Some(this))
     override def backward(gradOutput: Variable): Unit = {
@@ -82,6 +85,7 @@ object Function {
     }
   }
 
+  /**divide*/
   case class Div(v1: Variable, v2: Variable) extends Function {
     override def forward(): Variable = Variable(v1.data / v2.data, Some(this))
     override def backward(gradOutput: Variable): Unit = {
