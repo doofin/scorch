@@ -1,6 +1,8 @@
 import scorch.autograd._
 import scorch.nn.Dropout
 
+import Function._
+
 package object scorch {
   implicit class AutoGradDoubleOps(d: Double) {
     def +(v: Variable): Variable = v + d

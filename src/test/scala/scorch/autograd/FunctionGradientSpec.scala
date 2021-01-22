@@ -9,6 +9,8 @@ import org.scalatest._
 import scorch.TestUtil._
 import scorch.nn.Dropout.DropoutFunction
 
+import scorch.autograd.Function._
+
 class FunctionGradientSpec
     extends FlatSpec
     with Matchers

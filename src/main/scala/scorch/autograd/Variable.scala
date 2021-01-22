@@ -8,6 +8,8 @@ import scorch.nn.cnn.MaxPool2d
 
 import scala.language.implicitConversions
 
+import Function._
+
 object Variable {
   def apply(d: Double): Variable = Variable(Tensor(d))
   def apply(d: Double, name: Option[String]): Variable =
