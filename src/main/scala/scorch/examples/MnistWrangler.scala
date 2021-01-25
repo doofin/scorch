@@ -2,12 +2,12 @@ package scorch.examples
 
 import botkop.{numsca => ns}
 import scorch.autograd.Variable
-import scorch.data.loader.MnistDataLoader
+import scorch.dataloader.MnistDataLoader_img
 import scorch.nn.{Linear, Module}
 import scorch.optim.SGD
 import scorch._
 
-object MnistWrangler extends App {
+object MnistWrangler  {
   case class Net() extends Module {
 
     val fc1 = Linear(28 * 28, 50)
@@ -23,8 +23,8 @@ object MnistWrangler extends App {
   val lr = 0.03
 
   val net = Net()
-  val trainingSet = new MnistDataLoader("train", batchSize)
-  val validSet = new MnistDataLoader("validate", batchSize)
+  val trainingSet = new MnistDataLoader_img("train", batchSize)
+  val validSet = new MnistDataLoader_img("validate", batchSize)
   val optimizer = SGD(net.parameters, lr)
 
   for (epoch <- 1 to 100) {

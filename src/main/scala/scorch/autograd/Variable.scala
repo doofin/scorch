@@ -15,6 +15,7 @@ object Variable {
   def apply(d: Double, name: Option[String]): Variable =
     Variable(Tensor(d), name = name)
 
+
   implicit def moduleApply[T <: Module](m: T): (Variable) => Variable =
     m.forward
 }

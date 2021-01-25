@@ -19,7 +19,7 @@ import botkop.numsca.Tensor
 
 import scala.io.Source
 
-object classifyNames {
+object classifyNameNation_seq {
   val namesDir = "src/test/resources/names"
   def getListOfFiles(dir: String): List[File] = {
     val d = new File(dir)

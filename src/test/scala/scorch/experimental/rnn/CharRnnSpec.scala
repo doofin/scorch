@@ -17,7 +17,7 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.util.Random
 
-import dataloader.classifyNames._
+import dataloader.classifyNameNation_seq._
 
 import examples.charRnnHelpers._
 

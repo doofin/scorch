@@ -1,4 +1,4 @@
-package scorch.data.loader
+package scorch.dataloader
 
 import botkop.numsca.Tensor
 import com.typesafe.scalalogging.LazyLogging
@@ -8,7 +8,7 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.util.Random
 
-class MnistDataLoader(
+class MnistDataLoader_img(
     val mode: String,
     miniBatchSize: Int,
     take: Option[Int] = None,

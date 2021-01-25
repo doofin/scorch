@@ -8,7 +8,7 @@ import scorch.nn.cnn._
 import scorch.nn._
 import scorch.optim.SGD
 
-object ReadmeConvNet extends App with LazyLogging {
+object ReadmeConvNet extends  LazyLogging {
   // network blueprint for conv -> relu -> pool -> affine -> affine
   case class ConvReluPoolAffineNetwork() extends Module {
 

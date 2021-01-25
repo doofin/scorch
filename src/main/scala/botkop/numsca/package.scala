@@ -3,7 +3,10 @@ package botkop
 import org.nd4j.linalg.api.iter.NdIndexIterator
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.api.ops.impl.indexaccum.{IMax, IMin}
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.{GreaterThanOrEqual, LessThanOrEqual}
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.{
+  GreaterThanOrEqual,
+  LessThanOrEqual
+}
 import org.nd4j.linalg.api.ops.random.impl.Choice
 import org.nd4j.linalg.api.rng
 import org.nd4j.linalg.factory.Nd4j
@@ -69,9 +72,11 @@ package object numsca {
   }
   def randint(low: Int, shape: Int*): Tensor = randint(low, shape.toArray)
 
-  def uniform(low: Double = 0.0,
-              high: Double = 1.0,
-              shape: Array[Int]): Tensor =
+  def uniform(
+      low: Double = 0.0,
+      high: Double = 1.0,
+      shape: Array[Int]
+  ): Tensor =
     (new Tensor(Nd4j.randn(shape)) - low) / (high - low)
 
   def linspace(lower: Double, upper: Double, num: Int): Tensor =
@@ -130,6 +135,7 @@ package object numsca {
   def floor(t: Tensor): Tensor = new Tensor(Transforms.floor(t.array))
 
   def mean(t: Tensor): Tensor = new Tensor(Nd4j.mean(t.array))
+  def mean(t: INDArray): Tensor = new Tensor(Nd4j.mean(t))
   def mean(t: Tensor, axis: Int): Tensor = new Tensor(Nd4j.mean(t.array, axis))
 
   // really do not understand how they calculate the variance and std in nd4j

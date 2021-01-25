@@ -179,9 +179,9 @@ object Function {
   }
 
   case class Transpose(v: Variable) extends Function {
-    override def forward(): Variable = Variable(v.data.transpose, Some(this))
+    override def forward(): Variable = Variable(v.data.transpose(), Some(this))
     override def backward(gradOutput: Variable): Unit =
-      v.backward(Variable(gradOutput.data.transpose))
+      v.backward(Variable(gradOutput.data.transpose()))
   }
 
   // todo test this

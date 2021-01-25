@@ -11,7 +11,7 @@ import scorch.optim.{Adam, Nesterov, Optimizer, SGD}
 import scala.io.Source
 import scala.util.Random
 
-object CharModel extends App {
+object CharModel  {
   def tokenize(s: String): Array[Char] = s.toCharArray
   def join(s: Seq[Char]) = s.mkString
   val fileName = "src/test/resources/dinos.txt"
@@ -31,7 +31,7 @@ object CharModel extends App {
   model.run()
 }
 
-object WordModel extends App {
+object WordModel  {
   def tokenize(s: String): Array[String] =
     s.toLowerCase
       .replaceAll("[\\.',;:\\-!\\?\\(]+", " ")

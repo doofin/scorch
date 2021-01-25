@@ -1,5 +1,8 @@
-resolvers +=
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers ++=
+  Seq(
+    "jitpack" at "https://jitpack.io"
+//    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+  )
 
 val logDeps =
   Seq(
@@ -18,6 +21,17 @@ lazy val root = (project in file(".")).settings(
   name := "scorch",
   libraryDependencies ++= Seq(
     "org.nd4j" % "nd4j-native-platform" % "0.9.1",
-    "org.scalatest" %% "scalatest" % "3.0.3"
-  ) ++ logDeps
+    "org.scalatest" %% "scalatest" % "3.0.3",
+//    "com.github.doofin" %% "stdscala" % "master-SNAPSHOT"
+//    "com.github.doofin" %% "stdScala" % "master-f291752262-1"
+    "com.doofin" %% "stdscala" % "0.1-SNAPSHOT"
+  ) ++ logDeps ++ (CrossVersion
+    .partialVersion(scalaVersion.value) match {
+    case Some((2, major)) if major <= 12 =>
+      Seq()
+    case _ =>
+      Seq(
+        "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.0"
+      )
+  })
 )

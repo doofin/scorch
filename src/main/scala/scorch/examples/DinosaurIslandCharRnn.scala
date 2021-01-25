@@ -1,4 +1,4 @@
-package scorch.experimental.rnn
+package scorch.examples
 
 import botkop.numsca.Tensor
 import botkop.{numsca => ns}
@@ -22,7 +22,7 @@ import scala.util.Random
   * The dataset to train on is in "src/test/resources/dinos.txt".
   * Both vanilla RNN, GRU and LSTM are provided.
   */
-object DinosaurIslandCharRnn extends App {
+object DinosaurIslandCharRnn {
   ns.rand.setSeed(231)
   Random.setSeed(231)
 
@@ -31,7 +31,8 @@ object DinosaurIslandCharRnn extends App {
       .fromFile("src/test/resources/dinos.txt")
       .getLines()
       .map(_.toLowerCase)
-      .toList)
+      .toList
+  )
 
   val chars = examples.mkString.toCharArray.distinct.sorted :+ '\n'
   val vocabSize = chars.length
@@ -39,13 +40,15 @@ object DinosaurIslandCharRnn extends App {
   val EosIndex = charToIx('\n') // index for end of sentence
   val BosIndex = -1 // index for beginning of sentence
 
-  model("gru",
-        examples,
-        charToIx,
-        vocabSize = vocabSize,
-        na = 40,
-        maxStringSize = 60,
-        printEvery = 100)
+  model(
+    "gru",
+    examples,
+    charToIx,
+    vocabSize = vocabSize,
+    na = 40,
+    maxStringSize = 60,
+    printEvery = 100
+  )
 
   /**
     * Trains the model and generates dinosaur names
@@ -59,15 +62,17 @@ object DinosaurIslandCharRnn extends App {
     * @param maxStringSize maximum length of the generated string
     * @param printEvery print stats and samples after 'printEvery' iterations
     */
-  def model(cellType: String,
-            examples: List[String],
-            charToIx: Map[Char, Int],
-            numIterations: Int = 35000,
-            na: Int = 50,
-            numNames: Int = 7,
-            vocabSize: Int,
-            maxStringSize: Int = 50,
-            printEvery: Int = 1000): Unit = {
+  def model(
+      cellType: String,
+      examples: List[String],
+      charToIx: Map[Char, Int],
+      numIterations: Int = 35000,
+      na: Int = 50,
+      numNames: Int = 7,
+      vocabSize: Int,
+      maxStringSize: Int = 50,
+      printEvery: Int = 1000
+  ): Unit = {
     val (nx, ny) = (vocabSize, vocabSize)
 
     // define the RNN model
@@ -116,9 +121,11 @@ object DinosaurIslandCharRnn extends App {
     * @param vocabSize vocabulary size
     * @return predictions of the RNN over xs
     */
-  def rnnForward(xs: List[Int],
-                 rnn: BaseRnnCell,
-                 vocabSize: Int): List[Variable] =
+  def rnnForward(
+      xs: List[Int],
+      rnn: BaseRnnCell,
+      vocabSize: Int
+  ): List[Variable] =
     xs.foldLeft(List.empty[Variable], rnn.initialTrackingStates) {
         case ((yhs, p0), x) =>
           // one hot encoding of next x
@@ -140,10 +147,12 @@ object DinosaurIslandCharRnn extends App {
     * @param rnn the RNN model to work with
     * @return tuple of the value of the loss function (cross-entropy) and the last hidden state
     */
-  def optimize(xs: List[Int],
-               ys: List[Int],
-               rnn: BaseRnnCell,
-               optimizer: Optimizer): Double = {
+  def optimize(
+      xs: List[Int],
+      ys: List[Int],
+      rnn: BaseRnnCell,
+      optimizer: Optimizer
+  ): Double = {
     optimizer.zeroGrad()
     val yHat = rnnForward(xs, rnn, vocabSize)
     val loss = rnnLoss(yHat, ys)
@@ -260,34 +269,24 @@ object DinosaurIslandCharRnn extends App {
     }
   }
 
-  case class GruCell(wir: Variable,
-                     bir: Variable,
-                     whr: Variable,
-                     bhr: Variable,
-                     wiz: Variable,
-                     biz: Variable,
-                     whz: Variable,
-                     bhz: Variable,
-                     win: Variable,
-                     bin: Variable,
-                     whn: Variable,
-                     bhn: Variable,
-                     wy: Variable,
-                     by: Variable)
-      extends BaseRnnCell(Seq(wir,
-                              bir,
-                              whr,
-                              bhr,
-                              wiz,
-                              biz,
-                              whz,
-                              bhz,
-                              win,
-                              bin,
-                              whn,
-                              bhn,
-                              wy,
-                              by)) {
+  case class GruCell(
+      wir: Variable,
+      bir: Variable,
+      whr: Variable,
+      bhr: Variable,
+      wiz: Variable,
+      biz: Variable,
+      whz: Variable,
+      bhz: Variable,
+      win: Variable,
+      bin: Variable,
+      whn: Variable,
+      bhn: Variable,
+      wy: Variable,
+      by: Variable
+  ) extends BaseRnnCell(
+        Seq(wir, bir, whr, bhr, wiz, biz, whz, bhz, win, bin, whn, bhn, wy, by)
+      ) {
     override val na: Int = wir.shape.head
     override val numTrackingStates: Int = 1
 
@@ -326,20 +325,22 @@ object DinosaurIslandCharRnn extends App {
       val wy = Variable(ns.randn(ny, na) * 0.01, name = Some("wy"))
       val by = Variable(ns.zeros(ny, 1), name = Some("by"))
 
-      GruCell(wir,
-              bir,
-              whr,
-              bhr,
-              wiz,
-              biz,
-              whz,
-              bhz,
-              win,
-              bin,
-              whn,
-              bhn,
-              wy,
-              by)
+      GruCell(
+        wir,
+        bir,
+        whr,
+        bhr,
+        wiz,
+        biz,
+        whz,
+        bhz,
+        win,
+        bin,
+        whn,
+        bhn,
+        wy,
+        by
+      )
     }
   }
 
@@ -351,12 +352,13 @@ object DinosaurIslandCharRnn extends App {
     * @param ba Bias, of shape (na, 1)
     * @param by Bias relating the hidden-state to the output, of shape (ny, 1)
     */
-  case class RnnCell(wax: Variable,
-                     waa: Variable,
-                     wya: Variable,
-                     ba: Variable,
-                     by: Variable)
-      extends BaseRnnCell(Seq(wax, waa, wya, ba, by)) {
+  case class RnnCell(
+      wax: Variable,
+      waa: Variable,
+      wya: Variable,
+      ba: Variable,
+      by: Variable
+  ) extends BaseRnnCell(Seq(wax, waa, wya, ba, by)) {
 
     override val na: Int = wax.shape.head
     override val numTrackingStates: Int = 1
@@ -431,11 +433,13 @@ object DinosaurIslandCharRnn extends App {
     * @param maxStringSize maximum length of a generated string
     * @param na number of units of the RNN cell
     */
-  case class Sampler(rnn: BaseRnnCell,
-                     charToIx: Map[Char, Int],
-                     eolIndex: Int,
-                     maxStringSize: Int,
-                     na: Int) {
+  case class Sampler(
+      rnn: BaseRnnCell,
+      charToIx: Map[Char, Int],
+      eolIndex: Int,
+      maxStringSize: Int,
+      na: Int
+  ) {
     val vocabSize: Int = charToIx.size
     val ixToChar: Map[Int, Char] = charToIx.map(_.swap)
 
@@ -447,7 +451,8 @@ object DinosaurIslandCharRnn extends App {
       */
     def generateNextChar(
         xPrev: Variable,
-        pPrev: Seq[Variable]): (Variable, Int, Seq[Variable]) = {
+        pPrev: Seq[Variable]
+    ): (Variable, Int, Seq[Variable]) = {
       // Forward propagate x
       val next = rnn(xPrev +: pPrev)
       val (yHat, pNext) = (next.head, next.tail)
@@ -470,10 +475,12 @@ object DinosaurIslandCharRnn extends App {
       * @return indices
       */
     @tailrec
-    final def generate(t: Int,
-                       prevX: Variable,
-                       prev: Seq[Variable],
-                       indices: List[Int] = List.empty): List[Int] =
+    final def generate(
+        t: Int,
+        prevX: Variable,
+        prev: Seq[Variable],
+        indices: List[Int] = List.empty
+    ): List[Int] =
       if (indices.lastOption.contains(eolIndex)) {
         indices
       } else if (t >= maxStringSize) {
@@ -497,10 +504,11 @@ object DinosaurIslandCharRnn extends App {
     * @param maxValue  gradients above this number are set to this number, and everything less than -maxValue is set to -maxValue
     * @param lr learning rate
     */
-  case class ClippingSGD(parameters: Seq[Variable],
-                         lr: Double,
-                         maxValue: Double)
-      extends Optimizer(parameters) {
+  case class ClippingSGD(
+      parameters: Seq[Variable],
+      lr: Double,
+      maxValue: Double
+  ) extends Optimizer(parameters) {
     override def step(): Unit =
       parameters.foreach { p =>
         p.data -= ns.clip(p.grad.data, -maxValue, maxValue) * lr

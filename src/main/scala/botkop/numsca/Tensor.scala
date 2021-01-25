@@ -9,6 +9,7 @@ import org.nd4j.linalg.ops.transforms.Transforms
 import scala.collection.JavaConverters._
 import scala.language.{implicitConversions, postfixOps}
 
+/** wraps nd4j INDArray */
 class Tensor(val array: INDArray, val isBoolean: Boolean = false)
     extends Serializable {
 
@@ -91,7 +92,15 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   def /=(t: Tensor): Unit = array divi bc(t)
   def %=(t: Tensor): Unit = array fmodi bc(t)
 
+  /**
+    * Assign all of the elements in the given
+    * ndarray to this ndarray
+    */
   def :=(t: Tensor): Unit = array assign t.array
+
+  /**
+    * Set all entries of the ndarray to the specified value
+    */
   def :=(d: Double): Unit = array assign d
 
   def maximum(other: Tensor): Tensor = Ops.max(this, other)
@@ -234,29 +243,5 @@ object Tensor {
   }
 
   def apply(data: Double*): Tensor = Tensor(data.toArray)
-
-}
-
-case class TensorSelection(
-    t: Tensor,
-    indexes: Array[Array[Int]],
-    shape: Option[Array[Int]]
-) {
-
-  def asTensor: Tensor = {
-    val newData = indexes.map(ix => t.array.getDouble(ix: _*))
-    if (shape.isDefined)
-      Tensor(newData).reshape(shape.get)
-    else
-      Tensor(newData)
-  }
-
-  def :=(d: Double): Unit = indexes.foreach(t(_) := d)
-  def +=(d: Double): Unit = indexes.foreach(t(_) += d)
-  def -=(d: Double): Unit = indexes.foreach(t(_) -= d)
-  def *=(d: Double): Unit = indexes.foreach(t(_) *= d)
-  def /=(d: Double): Unit = indexes.foreach(t(_) /= d)
-  def %=(d: Double): Unit = indexes.foreach(t(_) %= d)
-  def **=(d: Double): Unit = indexes.foreach(t(_) **= d)
 
 }

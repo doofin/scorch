@@ -1,4 +1,4 @@
-package scorch.data.loader
+package scorch.dataloader
 
 import java.awt.image.BufferedImage
 import java.io._

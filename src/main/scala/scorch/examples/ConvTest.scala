@@ -6,12 +6,12 @@ import scorch.autograd.Variable
 import scorch.nn._
 import scorch.nn.cnn.{Conv2d, MaxPool2d}
 import scorch._
-import scorch.data.loader.{Cifar10DataLoader, DataLoader, MnistDataLoader}
+import scorch.dataloader._
 import scorch.optim.{Adam, Nesterov, Optimizer}
 
 import scala.util.Random
 
-object ConvTest extends App with LazyLogging {
+object ConvTest extends LazyLogging {
 
   case class Net() extends Module {
 
