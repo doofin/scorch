@@ -46,7 +46,7 @@ case class TemporalAffineFunction(x: Variable, w: Variable, b: Variable)
   val m: Int = w.shape.last
 
   override def forward(): Variable = {
-    val out = x.data.reshape(n * t, d).dot(w.data).reshape(n, t, m) + b.data.T
+    val out = x.data.reshape(n * t, d).dot(w.data).reshape(n, t, m) + b.data.transpose
     Variable(out, Some(this))
   }
 
@@ -54,9 +54,9 @@ case class TemporalAffineFunction(x: Variable, w: Variable, b: Variable)
     // dOut = n * t * m
 
     val dOut = gradOutput.data
-    val dx = dOut.reshape(n * t, m).dot(w.data.T).reshape(n, t, d)
-    val dw = dOut.reshape(n * t, m).T.dot(x.data.reshape(n * t, d)).T
-    val db = ns.sum(ns.sum(dOut, axis = 1), axis = 0).T // todo: fix numsca
+    val dx = dOut.reshape(n * t, m).dot(w.data.transpose).reshape(n, t, d)
+    val dw = dOut.reshape(n * t, m).transpose.dot(x.data.reshape(n * t, d)).transpose
+    val db = ns.sum(ns.sum(dOut, axis = 1), axis = 0).transpose // todo: fix numsca
 
     x.backward(Variable(dx))
     w.backward(Variable(dw))

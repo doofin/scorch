@@ -13,6 +13,49 @@ import scala.language.{implicitConversions, postfixOps}
 class Tensor(val array: INDArray, val isBoolean: Boolean = false)
     extends Serializable {
 
+  /**
+    * returns a view
+    */
+  def apply(index: Int*): Tensor = {
+    val ix = index.map(NDArrayIndex.point)
+    new Tensor(array.get(ix: _*))
+  }
+
+  /**
+    * returns a view
+    */
+  def apply(index: Array[Int]): Tensor = apply(index: _*)
+
+  private def handleNegIndex(i: Int, shapeIndex: Int) =
+    if (i < 0) shape(shapeIndex) + i else i
+
+  /**
+    * returns a view
+    */
+  def apply(ranges: NumscaRange*)(implicit dummy: Int = 0): Tensor = {
+
+    val indexes: Seq[INDArrayIndex] = ranges.zipWithIndex.map {
+      case (nr, i) =>
+        nr.to match {
+          case None if nr.from == 0 =>
+            NDArrayIndex.all()
+          case None =>
+            NDArrayIndex.interval(handleNegIndex(nr.from, i), shape(i))
+          case Some(n) =>
+            NDArrayIndex.interval(
+              handleNegIndex(nr.from, i),
+              handleNegIndex(n, i)
+            )
+        }
+    }
+    new Tensor(array.get(indexes: _*))
+  }
+
+  def apply(selection: Tensor*): TensorSelection = {
+    val (indexes, newShape) = selectIndexes(selection)
+    TensorSelection(this, indexes, newShape)
+  }
+
   def data: Array[Double] = array.dup.data.asDouble
 
   def copy(): Tensor = new Tensor(array.dup())
@@ -23,7 +66,7 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   def shapeLike(t: Tensor): Tensor = reshape(t.shape)
 
   def transpose() = new Tensor(array.transpose())
-  def T: Tensor = transpose()
+//  def transpose: Tensor = transpose()
   def transpose(axes: Array[Int]): Tensor = {
     require(axes.sorted sameElements shape.indices, "invalid axes")
     val newShape = axes.map(a => shape(a))
@@ -84,13 +127,13 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   /**
     * broadcast argument tensor with shape of this tensor
     */
-  private def bc(t: Tensor): INDArray = t.array.broadcast(shape: _*)
+  private def broadcast(t: Tensor): INDArray = t.array.broadcast(shape: _*)
 
-  def +=(t: Tensor): Unit = array addi bc(t)
-  def -=(t: Tensor): Unit = array subi bc(t)
-  def *=(t: Tensor): Unit = array muli bc(t)
-  def /=(t: Tensor): Unit = array divi bc(t)
-  def %=(t: Tensor): Unit = array fmodi bc(t)
+  def +=(t: Tensor): Unit = array addi broadcast(t)
+  def -=(t: Tensor): Unit = array subi broadcast(t)
+  def *=(t: Tensor): Unit = array muli broadcast(t)
+  def /=(t: Tensor): Unit = array divi broadcast(t)
+  def %=(t: Tensor): Unit = array fmodi broadcast(t)
 
   /**
     * Assign all of the elements in the given
@@ -114,55 +157,13 @@ class Tensor(val array: INDArray, val isBoolean: Boolean = false)
   def slice(i: Int): Tensor = new Tensor(array.slice(i))
   def slice(i: Int, dim: Int): Tensor = new Tensor(array.slice(i, dim))
 
+  /** Get the double value at the 0 index in the array */
   def squeeze(): Double = {
     require(shape.product == 1)
     array.getDouble(0)
   }
   def squeeze(index: Int*): Double = array.getDouble(index: _*)
   def squeeze(index: Array[Int]): Double = squeeze(index: _*)
-
-  /**
-    * returns a view
-    */
-  def apply(index: Int*): Tensor = {
-    val ix = index.map(NDArrayIndex.point)
-    new Tensor(array.get(ix: _*))
-  }
-
-  /**
-    * returns a view
-    */
-  def apply(index: Array[Int]): Tensor = apply(index: _*)
-
-  private def handleNegIndex(i: Int, shapeIndex: Int) =
-    if (i < 0) shape(shapeIndex) + i else i
-
-  /**
-    * returns a view
-    */
-  def apply(ranges: NumscaRange*)(implicit dummy: Int = 0): Tensor = {
-
-    val indexes: Seq[INDArrayIndex] = ranges.zipWithIndex.map {
-      case (nr, i) =>
-        nr.to match {
-          case None if nr.from == 0 =>
-            NDArrayIndex.all()
-          case None =>
-            NDArrayIndex.interval(handleNegIndex(nr.from, i), shape(i))
-          case Some(n) =>
-            NDArrayIndex.interval(
-              handleNegIndex(nr.from, i),
-              handleNegIndex(n, i)
-            )
-        }
-    }
-    new Tensor(array.get(indexes: _*))
-  }
-
-  def apply(selection: Tensor*): TensorSelection = {
-    val (indexes, newShape) = selectIndexes(selection)
-    TensorSelection(this, indexes, newShape)
-  }
 
   private def selectIndexes(
       selection: Seq[Tensor]

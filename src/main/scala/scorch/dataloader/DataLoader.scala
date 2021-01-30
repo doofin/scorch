@@ -2,30 +2,6 @@ package scorch.dataloader
 
 import scorch.autograd.Variable
 
-import java.io.{
-  FileInputStream,
-  FileOutputStream,
-  ObjectInputStream,
-  ObjectOutputStream
-}
-
-object objSerl {
-
-  def write[t](obj: t, path: String) = {
-    val out = new ObjectOutputStream(new FileOutputStream(path))
-    out.writeObject(obj)
-    out.close()
-  }
-
-  def read[t](path: String) = {
-    val in = new ObjectInputStream(new FileInputStream(path))
-    val fooToRead = in.readObject()
-    in.close()
-    fooToRead.asInstanceOf[t]
-  }
-
-  //    assert(fooToWrite == fooToRead)
-}
 trait DataLoader
     extends scala.collection.immutable.Iterable[(Variable, Variable)] {
   def numSamples: Int
@@ -42,7 +18,7 @@ object DataLoader {
   ): DataLoader =
     dataSet match {
       case "cifar-10" =>
-        new Cifar10DataLoader(mode, miniBatchSize, take = take)
+        new Cifar10_img(mode, miniBatchSize, take = take)
       case "mnist" =>
         new MnistDataLoader_img(mode, miniBatchSize, take)
     }

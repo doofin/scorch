@@ -4,19 +4,19 @@ import botkop.{numsca => ns}
 import botkop.numsca.Tensor
 import scorch.autograd.Variable
 
-case class Adam(parameters: Seq[Variable],
-                lr: Double,
-                beta1: Double = 0.9,
-                beta2: Double = 0.999,
-                epsilon: Double = 1e-8)
-    extends Optimizer(parameters) {
-
+case class Adam(
+    parameters: Seq[Variable],
+    lr: Double = 0.001,
+    beta1: Double = 0.9,
+    beta2: Double = 0.999,
+    epsilon: Double = 1e-8
+) extends Optimizer(parameters) {
   val ms: Seq[Tensor] = parameters.map(p => ns.zeros(p.shape: _*))
   val vs: Seq[Tensor] = parameters.map(p => ns.zeros(p.shape: _*))
 
   var t = 1
 
-  override def step(): Unit = parameters.zip(ms).zip(vs).foreach {
+  override def step(): Unit = (parameters zip ms zip vs).foreach {
     case ((p, m), v) =>
       val x = p.data
       val dx = p.grad.data

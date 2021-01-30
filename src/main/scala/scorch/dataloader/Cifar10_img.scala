@@ -13,9 +13,9 @@ import scala.collection.parallel.mutable.ParArray
 import scala.language.postfixOps
 import scala.util.Random
 
-import Cifar10DataLoader._
+import Cifar10_img._
 
-class Cifar10DataLoader(
+class Cifar10_img(
     val mode: String,
     miniBatchSize: Int,
     tailShape: Seq[Int] = Seq(3, 32, 32),
@@ -67,7 +67,7 @@ class Cifar10DataLoader(
 
 }
 
-object Cifar10DataLoader {
+object Cifar10_img {
 
   val numFeatures: Int = 32 * 32 * 3
 
@@ -157,7 +157,7 @@ object Cifar10DataLoader {
     yx
   }
 
-  def main(args: Array[String]): Unit = {
+  def main1(args: Array[String]): Unit = {
     val trainingFileList = getListOfFiles(
       "/Users/koen/projects/nazca/data/cifar-10/train"
     )

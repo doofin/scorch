@@ -1,6 +1,7 @@
 package scorch.dataloader
 
 import botkop.numsca.Tensor
+import com.doofin.stdScala.getHomeDir
 import com.typesafe.scalalogging.LazyLogging
 import scorch.autograd.Variable
 
@@ -16,7 +17,7 @@ class MnistDataLoader_img(
 ) extends DataLoader
     with LazyLogging {
 
-  val pat = s"${scorch.getHomeDir}/mass/mldata/mnist"
+  val pat = s"${getHomeDir}/mass/mldata/mnist"
   val file: String = mode match {
     case "train"    => pat + "/mnist_train.csv"
     case "validate" => pat + "/mnist_test.csv"

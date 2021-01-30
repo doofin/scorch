@@ -17,16 +17,19 @@ trait Function extends LazyLogging {
     unbroadcast(v.data, oldShape)
   }
 
+  /** revert broadcast.*/
   def unbroadcast(data: Tensor, oldShape: List[Int]): Variable = {
-    val t = oldShape.zip(data.shape).zipWithIndex.foldLeft(data) {
-      case (d: Tensor, ((oi, ni), i)) =>
-        if (oi == ni)
+    val shapesTup = (oldShape zip data.shape).zipWithIndex
+    val t = shapesTup.foldLeft(data) {
+      // todo : convert to match
+      case (d: Tensor, ((oldSp, newSp), idx)) =>
+        if (oldSp == newSp)
           d
-        else if (oi == 1)
-          ns.sum(d, axis = i)
+        else if (oldSp == 1)
+          ns.sum(d, axis = idx)
         else
           throw new Exception(
-            s"unable to unbroadcast shape ${data.shape.toList} to $oldShape"
+            s"unable to unbroadcast shape ${data.shape.toList} to $oldShape ,maybe in/out dimension is wrong?"
           )
     }
     Variable(t)
@@ -171,8 +174,8 @@ object Function {
     override def forward(): Variable = Variable(w dot x, Some(this))
     override def backward(gradOutput: Variable): Unit = {
       val dd = gradOutput.data
-      val dw = dd dot x.T
-      val dx = w.T dot dd
+      val dw = dd dot x.transpose
+      val dx = w.transpose dot dd
       v1.backward(Variable(dw))
       v2.backward(Variable(dx))
     }
@@ -309,7 +312,7 @@ object Function {
   /**Loss functions*/
   case class SoftmaxLoss(actual: Variable, target: Variable) extends Function {
     val x: Tensor = actual.data
-    val y: Tensor = target.data.T
+    val y: Tensor = target.data.transpose
 
     val shiftedLogits: Tensor = x - ns.max(x, axis = 1)
     val z: Tensor = ns.sum(ns.exp(shiftedLogits), axis = 1)
@@ -330,10 +333,10 @@ object Function {
 
   /**
     * Computes the cross-entropy loss
-    * @param actuals sequence of yHat variables
-    * @param targets sequence of Y indices (ground truth)
+    * @param yPred sequence of yPred variables
+    * @param y sequence of Y indices (ground truth)
     */
-  case class CrossEntropyLoss(actuals: Seq[Variable], targets: Seq[Int])
+  case class CrossEntropyLoss(yPred: Seq[Variable], y: Seq[Int])
       extends Function {
 
     /**
@@ -342,9 +345,9 @@ object Function {
       * @return the cross entropy loss variable
       */
     override def forward(): Variable = {
-      val seqLoss = actuals.zip(targets).foldLeft(0.0) {
-        case (loss, (yht, y)) =>
-          loss - ns.log(yht.data(y, 0)).squeeze()
+      val seqLoss = (yPred zip y).foldLeft(0.0) {
+        case (prevLoss, (y_pred: Variable, y_real: Int)) =>
+          prevLoss - ns.log(y_pred.data.apply(y_real, 0)).squeeze()
       }
       Variable(Tensor(seqLoss), Some(this))
     }
@@ -354,10 +357,10 @@ object Function {
       * @param gradOutput not used
       */
     override def backward(gradOutput: Variable): Unit = {
-      actuals.zip(targets).reverse.foreach {
+      (yPred zip y).reverse.foreach {
         case (yh, y) =>
           val dy = ns.copy(yh.data)
-          dy(y, 0) -= 1
+          dy.apply(y, 0) -= 1
           yh.backward(Variable(dy))
       }
     }

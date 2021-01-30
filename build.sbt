@@ -3,6 +3,8 @@ resolvers ++=
     "jitpack" at "https://jitpack.io"
 //    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
   )
+//https://www.scala-sbt.org/1.x/docs/In-Process-Classloaders.html
+classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 
 val logDeps =
   Seq(
@@ -23,7 +25,7 @@ lazy val root = (project in file(".")).settings(
     "org.nd4j" % "nd4j-native-platform" % "0.9.1",
     "org.scalatest" %% "scalatest" % "3.0.3",
 //    "com.github.doofin" %% "stdscala" % "master-SNAPSHOT"
-//    "com.github.doofin" %% "stdScala" % "master-f291752262-1"
+//    "com.github.doofin" %% "stdScala" % "master-SNAPSHOT"
     "com.doofin" %% "stdscala" % "0.1-SNAPSHOT"
   ) ++ logDeps ++ (CrossVersion
     .partialVersion(scalaVersion.value) match {

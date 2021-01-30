@@ -256,7 +256,7 @@ object Conv2d extends LazyLogging {
       (imNum, col)
     }
 
-    val filterCol: Tensor = w.data.reshape(f, -1).T
+    val filterCol: Tensor = w.data.reshape(f, -1).transpose
 
     private val initEnd = System.currentTimeMillis()
     logger.debug(s"initialization took ${initEnd - initStart} ms.")
@@ -284,16 +284,16 @@ object Conv2d extends LazyLogging {
       val db = zerosLike(b.data)
 
       for ((i, imCol) <- imCols) {
-        val dMul = ns.reshape(dOut(i), f, -1).T
+        val dMul = ns.reshape(dOut(i), f, -1).transpose()
         db += ns.sum(dMul, axis = 0)
 
-        val dFilterCol = imCol.T.dot(dMul)
-        val dimCol = dMul.dot(filterCol.T)
+        val dFilterCol = imCol.transpose().dot(dMul)
+        val dimCol = dMul.dot(filterCol.transpose())
 
         val dxPadded = col2imBack(dimCol, hPrime, wPrime, stride, hh, ww, c)
         dx(i) := dxPadded(:>, pad :> height + pad, pad :> width + pad)
 
-        dw += ns.reshape(dFilterCol.T, f, c, hh, ww)
+        dw += ns.reshape(dFilterCol.transpose(), f, c, hh, ww)
       }
 
       x.backward(Variable(dx))

@@ -22,7 +22,7 @@ import scala.util.Random
   * The dataset to train on is in "src/test/resources/dinos.txt".
   * Both vanilla RNN, GRU and LSTM are provided.
   */
-object DinosaurIslandCharRnn {
+object rnn_DinosaurIsland {
   ns.rand.setSeed(231)
   Random.setSeed(231)
 

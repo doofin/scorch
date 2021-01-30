@@ -50,7 +50,7 @@ object TemporalSoftmax {
     val dxFlat: Tensor = probs
     dxFlat(ns.arange(n * t), yFlat) -= 1
     dxFlat /= n
-    dxFlat *= maskFlat.T
+    dxFlat *= maskFlat.transpose
 
     val dx: Tensor = dxFlat.reshape(n, t, v)
 

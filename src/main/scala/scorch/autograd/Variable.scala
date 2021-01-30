@@ -15,7 +15,6 @@ object Variable {
   def apply(d: Double, name: Option[String]): Variable =
     Variable(Tensor(d), name = name)
 
-
   implicit def moduleApply[T <: Module](m: T): (Variable) => Variable =
     m.forward
 }
@@ -58,7 +57,7 @@ case class Variable(
   def /(d: Double): Variable = DivConstant(this, d).forward()
   def **(d: Double): Variable = PowConstant(this, d).forward()
 
-  def t(): Variable = Transpose(this).forward()
+  def transpose(): Variable = Transpose(this).forward()
   def reshape(shape: List[Int]): Variable = Reshape(this, shape).forward()
   def reshape(shape: Int*): Variable = reshape(shape.toList)
 

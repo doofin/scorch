@@ -7,6 +7,7 @@ import org.nd4j.linalg.factory.Nd4j
 import org.scalatest.{FlatSpec, Matchers}
 import scorch.TestUtil._
 import scorch.autograd._
+import scorch.nn.rnn.RnnFunction
 
 import scala.language.postfixOps
 

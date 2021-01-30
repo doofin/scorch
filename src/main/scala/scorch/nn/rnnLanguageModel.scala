@@ -7,7 +7,7 @@ import scorch.crossEntropyLoss
 import scorch.nn.rnn.RnnBase
 import scorch.optim.{Adam, Nesterov, Optimizer, SGD}
 
-class LanguageModel[T](
+class rnnLanguageModel[T](
     corpus: Seq[String],
     tokenize: (String) => Seq[T],
     join: Seq[T] => String,
@@ -16,10 +16,10 @@ class LanguageModel[T](
     optimizerType: String = "adam",
     learningRate: Double = 0.001,
     na: Int = 50,
-    numIterations: Int = Int.MaxValue,
+    numIterations: Int = 1000,
     maxSentenceSize: Int = 60,
     numSentences: Int = 8,
-    printEvery: Int = 100,
+    printEvery: Int = 100
 )(implicit ordering: Ordering[T])
     extends LazyLogging {
 
@@ -58,6 +58,10 @@ class LanguageModel[T](
     optimizer.zeroGrad()
     val yHat = rnn.forward(xs.map(encode))
     val loss = crossEntropyLoss(yHat, ys)
+
+//    val head = yHat.head
+//    println(head.shape, ",,,", head, ",,,", ys.head)
+
     loss.backward()
     optimizer.step()
     loss.data.squeeze()
@@ -75,7 +79,8 @@ class LanguageModel[T](
       totalLoss += loss
 
       if (j % printEvery == 0) {
-        println(s"Iteration: $j, Loss: ${totalLoss / printEvery}")
+//        println(s"Iteration: $j, Loss: ${totalLoss / printEvery}")
+        println(s"Iteration: $j, Loss: $loss")
         for (_ <- 1 to numSentences) {
           val sampledIndices =
             rnn.sample(encode, bosIndex, eosIndex, maxSentenceSize)
@@ -102,7 +107,3 @@ class LanguageModel[T](
   }
 
 }
-
-
-
-

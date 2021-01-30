@@ -1,7 +1,7 @@
 package scorch.data
 
 object Graphs {
-  case class Graph[nP, eP](nds: Seq[Node[nP]], egs: Seq[Edge[eP]]) {
+  case class Graph[nP, eP,gP](nds: Seq[Node[nP]], egs: Seq[Edge[eP]],grProp:gP) {
     def check = {
 
       /** no duplicate node*/

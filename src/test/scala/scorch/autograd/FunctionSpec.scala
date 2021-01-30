@@ -12,7 +12,7 @@ class FunctionSpec extends FlatSpec with Matchers {
     val v = Variable(ns.randn(4, 6))
     val w = Variable(ns.randn(6, 4))
 
-    val vt = v.t()
+    val vt = v.transpose()
     vt.shape shouldBe List(6, 4)
 
     vt.backward(w)
@@ -62,7 +62,7 @@ class FunctionSpec extends FlatSpec with Matchers {
 
     val x = makeVariable(numSamples, inputFeatures)
 
-    val d = x.dot(w.t())
+    val d = x.dot(w.transpose())
     d.shape shouldBe List(numSamples, outputFeatures)
 
     val y = d + b

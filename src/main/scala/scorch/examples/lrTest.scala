@@ -1,17 +1,15 @@
-package scorch
+package scorch.examples
 
 import botkop.numsca.Tensor
-import botkop.{numsca => ns}
-import scorch._
 import scorch.autograd.Variable
-import scorch.nn.cnn._
-import scorch.nn._
+import scorch.nn.Linear
 import scorch.optim.{Adam, SGD}
-
-object scorTest {
+import botkop.{numsca=>ns}
+object lrTest {
   val f1: Tensor => Tensor = { t: Tensor =>
     t * 3 + 1.0
   }
+
   def lr2 = {
     val fc1 = Linear(1, 1) // an affine operation: y = Wx + b
 
@@ -33,10 +31,11 @@ object scorTest {
       optimizer.step()
     }
   }
+
   def lrTest = {
     val fc1 = Linear(1, 1) // an affine operation: y = Wx + b
 
-//    val optimizer = Adam(Seq(fc1) flatMap (_.parameters), lr = 0.01)
+    //    val optimizer = Adam(Seq(fc1) flatMap (_.parameters), lr = 0.01)
     val optimizer = Adam(Seq(fc1) flatMap (_.parameters), lr = 0.1)
 
     (1 to 100) foreach { i =>
