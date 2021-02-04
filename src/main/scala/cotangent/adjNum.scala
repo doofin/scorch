@@ -1,7 +1,7 @@
 package cotangent
 
-import org.nd4j.linalg.api.ndarray.INDArray
-
+import org.platanios.tensorflow.api.tensors._
+//http://platanios.org/tensorflow_scala/guides/tensors.html
 object adjNum {
   def run = {
     val a = new adjNum(null)
@@ -11,7 +11,10 @@ object adjNum {
   }
 
 }
-case class adjNum(nDArray: INDArray, gradF: Option[adjNum => adjNum] = None) {
+case class adjNum(
+    nDArray: Tensor[Float],
+    gradF: Option[adjNum => adjNum] = None
+) {
   def push(): Unit = {}
 
   /**backward*/
@@ -19,6 +22,7 @@ case class adjNum(nDArray: INDArray, gradF: Option[adjNum => adjNum] = None) {
 
 // d (a+b)=da + db
   def +(b: adjNum) = {
+
     b.gradF
     val f = for {
       a <- gradF

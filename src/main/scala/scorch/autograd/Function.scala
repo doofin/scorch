@@ -46,13 +46,16 @@ object Function {
   /** d(a+b)=d(a) + d b*/
   case class Add(v1: Variable, v2: Variable) extends Function {
     override def forward(): Variable = {
-      println("forward: ", v1.shape, v2.shape)
+//      println("forward: ", v1.shape, v2.shape)
       Variable(v1.data + v2.data, gradFn = Some(this))
     }
     override def backward(gradOutput: Variable): Unit = {
-      println("backward: ", v1.shape, v2.shape, gradOutput.shape)
-      v1.backward(unbroadcast(gradOutput.data, v1.shape))
-      v2.backward(unbroadcast(gradOutput.data, v2.shape))
+//      println("backward: ", v1.shape, v2.shape, gradOutput.shape)
+//      v1.backward(unbroadcast(gradOutput.data, v1.shape))
+//      v2.backward(unbroadcast(gradOutput.data, v2.shape))
+      v1.backward(gradOutput)
+      v2.backward(gradOutput)
+
     }
   }
 
