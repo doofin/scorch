@@ -8,7 +8,7 @@ import org.nd4j.linalg.api.buffer.DataBuffer
 import org.nd4j.linalg.factory.Nd4j
 import org.scalatest.{FlatSpec, Matchers}
 import scorch.autograd._
-import scorch.nn._
+import scorch.supervised._
 import scorch._
 import scorch.optim.{Optimizer, SGD}
 import Function._

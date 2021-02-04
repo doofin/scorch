@@ -2,7 +2,7 @@ package scorch.examples
 
 import botkop.numsca.Tensor
 import scorch.autograd.Variable
-import scorch.nn.Linear
+import scorch.supervised.Linear
 import scorch.optim.{Adam, SGD}
 import botkop.{numsca=>ns}
 object lrTest {

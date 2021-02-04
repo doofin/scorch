@@ -4,8 +4,8 @@ import botkop.{numsca => ns}
 import com.typesafe.scalalogging.LazyLogging
 import scorch.autograd.Variable
 import scorch.crossEntropyLoss
-import scorch.nn.rnnLanguageModel
-import scorch.nn.rnn.RnnBase
+import scorch.supervised.rnnLanguageModel
+import scorch.supervised.rnn.RnnBase
 import scorch.optim.{Adam, Nesterov, Optimizer, SGD}
 
 import scala.io.Source

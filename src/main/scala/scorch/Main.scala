@@ -9,6 +9,8 @@ object Main {
     //    examples.WordModel.run
     //    nn.gnn.GIN.r
     fc_Mnist.run
+//    nd4jBench.run
+//    cotangent.demo.run
   }
 
 }

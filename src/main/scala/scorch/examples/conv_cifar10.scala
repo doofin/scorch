@@ -3,8 +3,8 @@ package scorch.examples
 import botkop.{numsca => ns}
 import com.typesafe.scalalogging.LazyLogging
 import scorch.autograd.Variable
-import scorch.nn._
-import scorch.nn.cnn.{Conv2d, MaxPool2d}
+import scorch.supervised._
+import scorch.supervised.cnn.{Conv2d, MaxPool2d}
 import scorch._
 import scorch.dataloader._
 import scorch.optim.{Adam, Nesterov, Optimizer}
@@ -98,12 +98,12 @@ object conv_cifar10 extends LazyLogging {
     loop(net, optimizer, loader, testLoader, batchSize, printEvery)
 
     def loop(
-        model: Module,
-        optimizer: Optimizer,
-        trainLoader: => DataLoader,
-        testLoader: => DataLoader,
-        batchSize: Int,
-        printEvery: Int
+              model: Module,
+              optimizer: Optimizer,
+              trainLoader: => DataLoaderOld,
+              testLoader: => DataLoaderOld,
+              batchSize: Int,
+              printEvery: Int
     ): Unit = {
 
       for (epoch <- 1 to 100) {
@@ -160,7 +160,7 @@ object conv_cifar10 extends LazyLogging {
       }
     }
 
-    def evaluateModel(model: Module, testLoader: DataLoader): Unit = {
+    def evaluateModel(model: Module, testLoader: DataLoaderOld): Unit = {
       // set in evaluation mode
       model.eval()
       val avgAccuracy =

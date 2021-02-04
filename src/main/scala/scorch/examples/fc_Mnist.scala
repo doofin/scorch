@@ -3,7 +3,7 @@ package scorch.examples
 import botkop.{numsca => ns}
 import scorch.autograd.Variable
 import scorch.dataloader.MnistDataLoader_img
-import scorch.nn.{Linear, Module}
+import scorch.supervised.{Linear, Module}
 import scorch.optim.{Adam, SGD}
 import scorch._
 
@@ -35,13 +35,13 @@ object fc_Mnist {
     val validSet = new MnistDataLoader_img("validate", batchSize)
     val optimizer = Adam(net.parameters, 0.001)
 
-    for (epoch <- 1 to 100) {
+    for (epoch <- 1 to 1) {
 
       var avgLoss = 0.0
       var avgAccuracy = 0.0
       var count = 0
 
-      trainSet.foreach {
+      trainSet.take(1).foreach {
         case (x, y) =>
           count += 1
           net.zeroGrad()

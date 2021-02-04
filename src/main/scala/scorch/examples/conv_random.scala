@@ -4,8 +4,8 @@ import botkop.{numsca => ns}
 import com.typesafe.scalalogging.LazyLogging
 import scorch._
 import scorch.autograd.Variable
-import scorch.nn.cnn._
-import scorch.nn._
+import scorch.supervised.cnn._
+import scorch.supervised._
 import scorch.optim.SGD
 
 object conv_random extends LazyLogging {

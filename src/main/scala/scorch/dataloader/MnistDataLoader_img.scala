@@ -14,7 +14,7 @@ class MnistDataLoader_img(
     miniBatchSize: Int,
     take: Option[Int] = None,
     seed: Long = 231
-) extends DataLoader
+) extends DataLoaderOld
     with LazyLogging {
 
   val pat = s"${getHomeDir}/mass/mldata/mnist"

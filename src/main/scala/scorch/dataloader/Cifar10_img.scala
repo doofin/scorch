@@ -21,7 +21,7 @@ class Cifar10_img(
     tailShape: Seq[Int] = Seq(3, 32, 32),
     take: Option[Int] = None,
     seed: Long = 231
-) extends DataLoader
+) extends DataLoaderOld
     with LazyLogging {
 
   val folder: String =

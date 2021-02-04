@@ -207,9 +207,11 @@ package object numsca {
     }
   }
 
-  // ops between 2 tensors, with broadcasting
+  /** ops between 2 tensors, with broadcasting */
   object Ops {
 
+    /**
+      * add with broadcasting */
     def add(t1: Tensor, t2: Tensor): Tensor = {
       val Seq(ba1, ba2) = tbc(t1, t2)
       new Tensor(ba1.add(ba2))

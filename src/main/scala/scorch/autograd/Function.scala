@@ -1,46 +1,58 @@
 package scorch.autograd
 
 import com.typesafe.scalalogging.LazyLogging
+import scala.language.postfixOps
 
 import botkop.numsca.Tensor
 import botkop.{numsca => ns}
 import ns._
 
-import scala.language.postfixOps
-
-/** autodiff via reverse rule of Differentiation*/
+/** autodiff via reverse rule of Differentiation
+  * Function.forward -> Variable
+  * */
 trait Function extends LazyLogging {
   def forward(): Variable
-  def backward(gradOutput: Variable): Unit
 
-  def unbroadcast(v: Variable, oldShape: List[Int]): Variable = {
-    unbroadcast(v.data, oldShape)
-  }
+  /** gradOutput is du/dz */
+  def backward(gradOutput: Variable): Unit
+}
+
+object Function {
 
   /** revert broadcast.*/
-  def unbroadcast(data: Tensor, oldShape: List[Int]): Variable = {
-    val shapesTup = (oldShape zip data.shape).zipWithIndex
-    val t = shapesTup.foldLeft(data) {
-      // todo : convert to match
-      case (d: Tensor, ((oldSp, newSp), idx)) =>
-        if (oldSp == newSp)
-          d
-        else if (oldSp == 1)
-          ns.sum(d, axis = idx)
-        else
-          throw new Exception(
-            s"unable to unbroadcast shape ${data.shape.toList} to $oldShape ,maybe in/out dimension is wrong?"
-          )
-    }
-    Variable(t)
+  def unbroadcast(ts: Tensor, oldShape: List[Int]): Variable = {
+    val shapesTup = (oldShape zip ts.shape).zipWithIndex
+    val bool = oldShape == ts.shape.toList
+    println("shapesTup equ: ", bool)
+    Variable(
+      if (bool) ts
+      else {
+        shapesTup.foldLeft(ts) {
+          case (d: Tensor, ((oldSp, tSp), idx)) =>
+            if (oldSp == tSp) {
+              d
+            } else if (oldSp == 1) {
+              println("unbroadcast changed")
+              ns.sum(d, axis = idx)
+            } else
+              throw new Exception(
+                s"unable to unbroadcast shape ${ts.shape.toList} to $oldShape ,maybe in/out dimension is wrong?"
+              )
+        }
+      }
+    )
   }
-}
-object Function {
+
+  /** d(a+b)=d(a) + d b*/
   case class Add(v1: Variable, v2: Variable) extends Function {
-    def forward(): Variable = Variable(v1.data + v2.data, gradFn = Some(this))
-    def backward(gradOutput: Variable): Unit = {
-      v1.backward(unbroadcast(gradOutput, v1.shape))
-      v2.backward(unbroadcast(gradOutput, v2.shape))
+    override def forward(): Variable = {
+      println("forward: ", v1.shape, v2.shape)
+      Variable(v1.data + v2.data, gradFn = Some(this))
+    }
+    override def backward(gradOutput: Variable): Unit = {
+      println("backward: ", v1.shape, v2.shape, gradOutput.shape)
+      v1.backward(unbroadcast(gradOutput.data, v1.shape))
+      v2.backward(unbroadcast(gradOutput.data, v2.shape))
     }
   }
 
@@ -54,7 +66,7 @@ object Function {
   case class Sub(v1: Variable, v2: Variable) extends Function {
     def forward(): Variable = Variable(v1.data - v2.data, gradFn = Some(this))
     def backward(gradOutput: Variable): Unit = {
-      v1.backward(unbroadcast(gradOutput, v1.shape))
+      v1.backward(unbroadcast(gradOutput.data, v1.shape))
       v2.backward(unbroadcast(-gradOutput.data, v2.shape))
     }
   }
@@ -70,15 +82,20 @@ object Function {
   case class Mul(v1: Variable, v2: Variable) extends Function {
     override def forward(): Variable = Variable(v1.data * v2.data, Some(this))
     override def backward(gradOutput: Variable): Unit = {
-      val dv1 = v2.data * gradOutput.data
-      val vdv1 = unbroadcast(dv1, v1.shape)
-      val dv2 = v1.data * gradOutput.data
-      val vdv2 = unbroadcast(dv2, v2.shape)
-      v1.backward(vdv1)
-      v2.backward(vdv2)
+      val dv1 = unbroadcast(v2.data * gradOutput.data, v1.shape)
+      val dv2 = unbroadcast(v1.data * gradOutput.data, v2.shape)
+      v1.backward(dv1)
+      v2.backward(dv2)
     }
   }
 
+  /**
+  x = ?
+  y = ?
+  z= x * y
+
+  du/dx=du/dz * dz/dx = du/dz * y
+    */
   case class MulConstant(v: Variable, d: Double) extends Function {
     override def forward(): Variable = Variable(v.data * d, Some(this))
     override def backward(gradOutput: Variable): Unit = {
@@ -110,42 +127,23 @@ object Function {
     }
   }
 
-  /* Pow of 2 tensors is currently not implemented in numsca
-  case class Pow(a: Variable, b: Variable) extends Function {
-
-
-    override def forward(): Variable = {
-      Variable(a.data ** b.data, Some(this))
-    }
-
-    override def backward(gradOutput: Variable): Unit = {
-       val ga = gradOutput.data * b.data * (a.data ** (b.data - 1))
-       val gb = gradOutput.data * (a.data ** b.data) * ns.log(a.data)
-
-      val vga = unbroadcast(ga, a.shape)
-      val vgb = unbroadcast(gb, b.shape)
-
-      logger.debug(s"pow backward, ga.shape=${vga.shape}, gb.shape=${vgb.shape}")
-      a.backward(vga)
-      b.backward(vgb)
-    }
-  }
-   */
-
+  /**power by a constant double
+    * d (x ^ n) = n *  d x ^ (n-1)
+    * */
   case class PowConstant(v: Variable, d: Double) extends Function {
+    val dv: Tensor = d * ns.power(v.data, d - 1)
     override def forward(): Variable = Variable(ns.power(v.data, d), Some(this))
-    val cache: Tensor = d * ns.power(v.data, d - 1)
     override def backward(gradOutput: Variable): Unit = {
-      val dv = cache * gradOutput.data
-      v.backward(Variable(dv))
+      v.backward(Variable(dv * gradOutput.data))
     }
   }
 
+  /**square root d x^1/2  = 1/2 x ^ 2*/
   case class Sqrt(v: Variable) extends Function {
-    val cache: Tensor = ns.sqrt(v.data)
-    override def forward(): Variable = Variable(cache, Some(this))
+    val sqrt_cache: Tensor = ns.sqrt(v.data)
+    override def forward(): Variable = Variable(sqrt_cache, Some(this))
     override def backward(gradOutput: Variable): Unit = {
-      val dv = (1.0 / (2 * cache)) * gradOutput.data
+      val dv = (1.0 / (2 * sqrt_cache)) * gradOutput.data
       v.backward(Variable(dv))
     }
   }
@@ -234,17 +232,21 @@ object Function {
   }
 
   case class Tanh(v: Variable) extends Function {
-    val cache: Tensor = ns.tanh(v.data)
-    override def forward(): Variable = Variable(cache, Some(this))
-    override def backward(gradOutput: Variable): Unit =
-      v.backward(Variable((1 - ns.square(cache)) * gradOutput.data))
+    val fv: Tensor = ns.tanh(v.data)
+    override def forward(): Variable = Variable(fv, Some(this))
+    override def backward(gradOutput: Variable): Unit = {
+      val dfv = 1 - ns.square(fv)
+      v.backward(Variable(dfv * gradOutput.data))
+    }
   }
 
   case class Sigmoid(v: Variable) extends Function {
-    lazy val sigmoid: Tensor = ns.sigmoid(v.data)
-    override def forward(): Variable = Variable(sigmoid, Some(this))
-    override def backward(gradOutput: Variable): Unit =
-      v.backward(Variable(gradOutput.data * sigmoid * (1 - sigmoid)))
+    lazy val fv: Tensor = ns.sigmoid(v.data)
+    override def forward(): Variable = Variable(fv, Some(this))
+    override def backward(gradOutput: Variable): Unit = {
+      val dfv = fv * (1 - fv)
+      v.backward(Variable(gradOutput.data * dfv))
+    }
   }
 
   case class Softmax(v: Variable) extends Function {
@@ -367,3 +369,24 @@ object Function {
   }
 
 }
+/* Pow of 2 tensors is currently not implemented in numsca
+case class Pow(a: Variable, b: Variable) extends Function {
+
+
+  override def forward(): Variable = {
+    Variable(a.data ** b.data, Some(this))
+  }
+
+  override def backward(gradOutput: Variable): Unit = {
+     val ga = gradOutput.data * b.data * (a.data ** (b.data - 1))
+     val gb = gradOutput.data * (a.data ** b.data) * ns.log(a.data)
+
+    val vga = unbroadcast(ga, a.shape)
+    val vgb = unbroadcast(gb, b.shape)
+
+    logger.debug(s"pow backward, ga.shape=${vga.shape}, gb.shape=${vgb.shape}")
+    a.backward(vga)
+    b.backward(vgb)
+  }
+}
+ */

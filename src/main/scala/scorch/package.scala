@@ -1,5 +1,5 @@
 import scorch.autograd._
-import scorch.nn.Dropout
+import scorch.supervised.Dropout
 
 import Function._
 

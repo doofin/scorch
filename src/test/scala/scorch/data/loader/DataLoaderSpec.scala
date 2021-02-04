@@ -7,8 +7,8 @@ import org.nd4j.linalg.factory.Nd4j
 import org.scalatest.{FlatSpec, Matchers}
 import scorch._
 import scorch.autograd.Variable
-import scorch.nn.cnn.{Conv2d, MaxPool2d}
-import scorch.nn.{Linear, Module}
+import scorch.supervised.cnn.{Conv2d, MaxPool2d}
+import scorch.supervised.{Linear, Module}
 import scorch.optim.Adam
 
 import scala.concurrent.duration._

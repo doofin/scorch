@@ -3,7 +3,7 @@ package scorch.autograd
 import botkop.numsca.Tensor
 import botkop.{numsca => ns}
 import org.scalatest.{FlatSpec, Matchers}
-import scorch.nn.Linear
+import scorch.supervised.Linear
 import scorch._
 
 class FunctionSpec extends FlatSpec with Matchers {

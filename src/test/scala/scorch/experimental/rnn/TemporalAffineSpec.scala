@@ -6,7 +6,7 @@ import org.nd4j.linalg.factory.Nd4j
 import org.scalatest.{FlatSpec, Matchers}
 import scorch.TestUtil._
 import scorch.autograd._
-import scorch.nn.Module
+import scorch.supervised.Module
 import scorch.experimental.rnn
 
 class TemporalAffineSpec extends FlatSpec with Matchers {

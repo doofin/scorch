@@ -7,7 +7,7 @@ import org.nd4j.linalg.factory.Nd4j
 import org.scalatest.{FlatSpec, Matchers}
 import scorch.TestUtil._
 import scorch.autograd._
-import scorch.nn._
+import scorch.supervised._
 import scorch._
 import scorch.optim.SGD
 

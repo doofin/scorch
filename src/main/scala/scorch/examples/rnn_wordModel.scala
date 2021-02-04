@@ -1,6 +1,6 @@
 package scorch.examples
 
-import scorch.nn.rnnLanguageModel
+import scorch.supervised.rnnLanguageModel
 
 import scala.io.Source
 import scala.util.Random

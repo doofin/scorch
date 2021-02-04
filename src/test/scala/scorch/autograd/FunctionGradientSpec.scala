@@ -7,7 +7,7 @@ import org.nd4j.linalg.api.buffer.DataBuffer
 import org.nd4j.linalg.factory.Nd4j
 import org.scalatest._
 import scorch.TestUtil._
-import scorch.nn.Dropout.DropoutFunction
+import scorch.supervised.Dropout.DropoutFunction
 
 import scorch.autograd.Function._
 

@@ -24,8 +24,8 @@ package scorch.experimental
 import botkop.{numsca => ns}
 import scorch._
 import scorch.autograd.Variable
-import scorch.nn.cnn._
-import scorch.nn._
+import scorch.supervised.cnn._
+import scorch.supervised._
 import scorch.optim.SGD
 
 object ReadmeConvNet extends App {
@@ -202,9 +202,10 @@ A typical training procedure for a neural network is as follows:
   
 ### Define the network
 Let’s define this network:
+
 ```scala
 import scorch.autograd.Variable
-import scorch.nn._
+import scorch.supervised._
 import scorch._
 
 val numSamples = 128
@@ -218,7 +219,7 @@ case class Net() extends Module {
   val fc2 = Linear(nf2, numClasses) // another one
 
   // glue the layers with a relu non-linearity: fc1 -> relu -> fc2
-  override def forward(x: Variable): Variable = 
+  override def forward(x: Variable): Variable =
     x ~> fc1 ~> relu ~> fc2
 }
 

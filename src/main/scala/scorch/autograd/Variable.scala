@@ -5,8 +5,8 @@ import scala.language.implicitConversions
 import botkop.numsca.Tensor
 import botkop.{numsca => ns}
 import com.typesafe.scalalogging.LazyLogging
-import scorch.nn.Module
-import scorch.nn.cnn.MaxPool2d
+import scorch.supervised.Module
+import scorch.supervised.cnn.MaxPool2d
 
 import Function._
 
@@ -23,24 +23,26 @@ case class Variable(
     data: Tensor,
     gradFn: Option[Function] = None,
     name: Option[String] = None
-) extends LazyLogging {
+) {
 
-  override def toString: String =
-    if (name.isDefined) s"name: ${name.get}, data: $data" else s"data: $data"
-
+  /**mutable */
   lazy val grad: Variable =
     Variable(ns.zerosLike(data), name = name.map(n => s"g_$n"))
-  def shape: List[Int] = data.shape.toList
 
-  def backward(): Unit = {
-    backward(Variable(ns.ones(data.shape)))
-  }
+  /**default val is all ones
+    * gradOutput is du/dz,set to 1 for reverse calc
+    * */
+  def backward(gradOutput: Variable = Variable(ns.ones(data.shape))): Unit = {
 
-  def backward(gradOutput: Variable): Unit = {
+//    in place (element wise) addition of two NDArrays
+//    aggre grad for all component , chain rule sums all components of a  vector
+//    https://en.wikipedia.org/wiki/Chain_rule#Multivariable_case
     grad.data += gradOutput.data
+//    will have gradFn after Function.forward
     for (gf <- gradFn) gf.backward(gradOutput)
   }
 
+  def shape: List[Int] = data.shape.toList
   def detach(name: Option[String] = None) = Variable(data, name = name)
 
   def +(other: Variable): Variable = Add(this, other).forward()
@@ -83,4 +85,8 @@ case class Variable(
 
   // chain operator
   def ~>(f: (Variable) => Variable): Variable = f(this)
+
+  override def toString: String =
+    if (name.isDefined) s"name: ${name.get}, data: $data" else s"data: $data"
+
 }
