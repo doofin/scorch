@@ -28,25 +28,27 @@ object fc_Mnist {
   }
 
   def run = {
-
     val batchSize = 1 //1024
+
     val net = fcNet()
     val trainSet = new MnistDataLoader_img("train", batchSize)
     val validSet = new MnistDataLoader_img("validate", batchSize)
     val optimizer = Adam(net.parameters, 0.001)
 
-    for (epoch <- 1 to 1) {
+//    val (epch, tset) = (100, trainSet.take(1))
+    val (epch, tset) = (100, trainSet)
+    for (epoch <- 1 to epch) {
 
       var avgLoss = 0.0
       var avgAccuracy = 0.0
       var count = 0
 
-      trainSet.take(1).foreach {
+      tset.foreach {
         case (x, y) =>
           count += 1
           net.zeroGrad()
           val output = net(x)
-          println("x y shape:", x.shape, y.shape) // todo bug! (x y shape:,List(10, 784),List(10, 1))
+//          println("x y shape:", x.shape, y.shape) // todo bug! (x y shape:,List(10, 784),List(10, 1))
           val loss = softmaxLoss(output, y)
           loss.backward()
           optimizer.step()
