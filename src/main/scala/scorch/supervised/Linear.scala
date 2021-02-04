@@ -8,17 +8,15 @@ case class Linear(weights: Variable, bias: Variable)
     extends Module(Seq(weights, bias)) {
 
   override def forward(x: Variable): Variable = {
-    (x dot weights.transpose()) + bias
+    (x dot weights) + bias //weights.transpose()
   }
 }
 
 object Linear {
   def apply(inFeatures: Int, outFeatures: Int): Linear = {
-    val w: Tensor =
-      ns.randn(outFeatures, inFeatures) * math.sqrt(2.0 / outFeatures)
-    val weights = Variable(w)
-    val b: Tensor = ns.zeros(1, outFeatures)
-    val bias = Variable(b)
+    println("new Linear: ", inFeatures, outFeatures)
+    val weights = Variable(ns.randn(inFeatures, outFeatures)) //* math.sqrt(2.0 / outFeatures)
+    val bias = Variable(ns.randn(1, outFeatures))
     Linear(weights, bias)
   }
 }

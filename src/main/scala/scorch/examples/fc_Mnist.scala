@@ -29,7 +29,7 @@ object fc_Mnist {
 
   def run = {
 
-    val batchSize = 10 //1024
+    val batchSize = 1 //1024
     val net = fcNet()
     val trainSet = new MnistDataLoader_img("train", batchSize)
     val validSet = new MnistDataLoader_img("validate", batchSize)
@@ -46,6 +46,7 @@ object fc_Mnist {
           count += 1
           net.zeroGrad()
           val output = net(x)
+          println("x y shape:", x.shape, y.shape) // todo bug! (x y shape:,List(10, 784),List(10, 1))
           val loss = softmaxLoss(output, y)
           loss.backward()
           optimizer.step()

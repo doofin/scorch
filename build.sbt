@@ -26,7 +26,8 @@ lazy val root = (project in file(".")).settings(
     "org.scalatest" %% "scalatest" % "3.0.3",
 //    "com.github.doofin" %% "stdscala" % "master-SNAPSHOT"
 //    "com.github.doofin" %% "stdScala" % "master-SNAPSHOT"
-    "com.doofin" %% "stdscala" % "0.1-SNAPSHOT"
+    "com.doofin" %% "stdscala" % "0.1-SNAPSHOT",
+    "org.deeplearning4j" % "deeplearning4j-core" % "0.9.1"
   ) ++ logDeps ++ (CrossVersion
     .partialVersion(scalaVersion.value) match {
     case Some((2, major)) if major <= 12 =>
