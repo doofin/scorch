@@ -8,9 +8,10 @@ object Main {
 //    examples.CharModel.run
     //    examples.WordModel.run
     //    nn.gnn.GIN.r
-    fc_Mnist.run
 //    nd4jBench.run
-//    cotangent.demo.run
+    //    cotangent.demo.run
+//    fc_Mnist.run
+    examples.lrTest.run
   }
 
 }

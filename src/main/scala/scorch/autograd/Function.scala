@@ -23,7 +23,7 @@ object Function {
   def unbroadcast(ts: Tensor, oldShape: List[Int]): Variable = {
     val shapesTup = (oldShape zip ts.shape).zipWithIndex
     val bool = oldShape == ts.shape.toList
-    println("shapesTup equ: ", bool)
+//    println("shapesTup equ: ", bool)
     Variable(
       if (bool) ts
       else {
@@ -32,7 +32,7 @@ object Function {
             if (oldSp == tSp) {
               d
             } else if (oldSp == 1) {
-              println("unbroadcast changed")
+//              println("unbroadcast changed")
               ns.sum(d, axis = idx)
             } else
               throw new Exception(
@@ -51,10 +51,10 @@ object Function {
     }
     override def backward(gradOutput: Variable): Unit = {
 //      println("backward: ", v1.shape, v2.shape, gradOutput.shape)
-//      v1.backward(unbroadcast(gradOutput.data, v1.shape))
-//      v2.backward(unbroadcast(gradOutput.data, v2.shape))
-      v1.backward(gradOutput)
-      v2.backward(gradOutput)
+      v1.backward(unbroadcast(gradOutput.data, v1.shape))
+      v2.backward(unbroadcast(gradOutput.data, v2.shape))
+//      v1.backward(gradOutput)
+//      v2.backward(gradOutput)
 
     }
   }
@@ -317,7 +317,7 @@ object Function {
   /**Loss functions*/
   case class SoftmaxLoss(actual: Variable, target: Variable) extends Function {
     val x: Tensor = actual.data
-    val y: Tensor = target.data.transpose
+    val y: Tensor = target.data.transpose()
 
     val shiftedLogits: Tensor = x - ns.max(x, axis = 1)
     val z: Tensor = ns.sum(ns.exp(shiftedLogits), axis = 1)
